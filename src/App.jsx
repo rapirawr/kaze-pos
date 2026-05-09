@@ -9,6 +9,8 @@ import Settings from './components/Settings'
 import CashCalculator from './components/CashCalculator'
 import KitchenDisplay from './components/KitchenDisplay'
 import CustomerDisplay from './components/CustomerDisplay'
+import Activation from './components/Activation'
+import { checkIsConfigured } from './supabaseClient'
 import './App.css'
 
 //  Icon Components
@@ -35,6 +37,8 @@ const IconCart = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0
 
 
 function App() {
+  const isConfigured = checkIsConfigured();
+  
   const [settings, setSettings] = useState({
     storeName: 'Kaze POS',
     storeAddress: 'Store Address',
@@ -128,10 +132,6 @@ function App() {
   const pointsDiscount = (usePoints && isPointsEnabled && activeMember) ? (pointsToRedeem * pointsValue) : 0;
   const earnedPoints = isPointsEnabled ? Math.floor(subtotal / pointsPerRupiah) : 0;
   const total = subtotal + taxAmount - discount - pointsDiscount;
-
-
-
-
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -2034,6 +2034,7 @@ function App() {
 }
 
 function Main() {
+  const isConfigured = checkIsConfigured();
   const [view, setView] = useState(window.location.hash);
 
   useEffect(() => {
@@ -2043,6 +2044,10 @@ function Main() {
     handleHash();
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
+
+  if (!isConfigured) {
+    return <Activation />;
+  }
 
   // Jika URL mengandung kata customer-view, tampilkan layar pelanggan
   if (view.includes('customer-view')) {
